@@ -15,7 +15,7 @@ typedef enum systemState
 {
 	SYSTEM_ON,
 	SYSTEM_OFF,
-	SYSTEM_CRASH
+	SYSTEM_FAILURE // low voltage, leakage, high current, collision, etc.
 } systemState;
 
 systemState readSystemState();

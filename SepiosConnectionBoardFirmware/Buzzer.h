@@ -10,9 +10,13 @@
 #define BUZZER_H_
 
 void buzzerInit();
+void buzzerClear();
 void buzzerPlayOne();
 void buzzerPlayDouble();
 void buzzerPlayTriple();
+void buzzerPlayFastN(uint8_t n);
+void buzzerPlayN(uint8_t n);
+void buzzerPlayNumber(uint16_t digit);
 void buzzerPlayLong();
 void buzzerOn();
 void buzzerOff();
