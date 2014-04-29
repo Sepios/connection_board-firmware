@@ -13,6 +13,7 @@
 #include "StateManagement.h"
 #include "Buzzer.h"
 #include "BatteryMonitoring.h"
+#include "I2CInterface.h"
 
 
 int main(void)
@@ -20,40 +21,46 @@ int main(void)
 	batteryInit();
 	systemSSRInit();
 	buzzerInit();
+	i2cInterfaceInit();
 	
+	
+	// Initial check for low voltage.
 	if (batteryIsLowVoltage())
 	{
-		writeSystemState(SYSTEM_FAILURE);
+		saveSystemState(SYSTEM_FAILURE);
 		systemSSROff();
 		buzzerPlayFastN(16);
 	}
 	else 
 	{
-		if (readSystemState() != SYSTEM_ON)
+		// If system was not ON (meaning OFF or FAILURE) last time, switch it ON.
+		if (loadSystemState() != SYSTEM_ON)
 		{
-			writeSystemState(SYSTEM_ON);
+			saveSystemState(SYSTEM_ON);
 			buzzerPlayTriple();
 			systemSSROn();
 		}
+		// If system was ON, switch it OFF.
 		else
 		{
-			writeSystemState(SYSTEM_OFF);
+			saveSystemState(SYSTEM_OFF);
 			systemSSROff();
 			buzzerPlayLong();
 		}
 	
-		
-		int lowVoltageCount = 0; // Counts to LOWVOLTAGECOUNTERLIMIT to prevent system from shuting-down on short voltage drops (like a low pass filter).
+		int lowVoltageCount = 0; // Counts to LOWVOLTAGECOUNTERLIMIT to prevent system from shuting-down on short voltage drops (working like a low pass filter, integrator).
 	
+	
+		// entering main loop.
 		while(1)
 		{
-			 
-		
+			_delay_ms(1000);
+			
+			// routinely check for low voltage. And 
 			if (batteryIsLowVoltage())
 			{
 				buzzerPlayFastN(8);
 				lowVoltageCount++;
-				systemSSROff();
 			}
 			else
 			{
@@ -63,21 +70,22 @@ int main(void)
 				{
 					buzzerPlayN(4);
 				}
-			
 			}
-		
+			
+			// if lowVoltageCount exceeded LOWVOLTAGECOUNTERLIMIT switch system off.
 			if (lowVoltageCount >= LOWVOLTAGECOUNTERLIMIT)
 			{
 				buzzerPlayLong();
-				writeSystemState(SYSTEM_FAILURE);
+				saveSystemState(SYSTEM_FAILURE);
 				break;
 			}
-			
-			_delay_ms(1000);
 		}
 	}
-	
-	buzzerOff();
+
+poweroff:
+	buzzerClear();
 	systemSSROff();
 	batteryClear();
 }
+
+

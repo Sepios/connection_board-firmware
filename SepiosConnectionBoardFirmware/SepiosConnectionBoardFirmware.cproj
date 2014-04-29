@@ -120,6 +120,12 @@
     <Compile Include="Buzzer.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="I2CInterface.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="I2CInterface.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="SepiosConnectionBoardFirmware.c">
       <SubType>compile</SubType>
     </Compile>
@@ -133,6 +139,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="SystemSSR.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usiTwiSlave.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usiTwiSlave.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>

@@ -6,17 +6,17 @@
  */ 
 
 
+
 #include "StateManagement.h"
 
 #include <avr/eeprom.h>
 
-
-enum systemState readSystemState()
+enum systemState loadSystemState()
 {
 	return (systemState)eeprom_read_byte((uint8_t*)SYSTEM_STATE_ADDR);
 }
 
-void writeSystemState(systemState state)
+void saveSystemState(systemState state)
 {
 	eeprom_write_byte ((uint8_t*)SYSTEM_STATE_ADDR, state);
 }
