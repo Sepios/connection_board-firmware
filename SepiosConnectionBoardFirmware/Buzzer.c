@@ -5,10 +5,12 @@
  *  Author: marwegma
  */
 
+#include "Buzzer.h"
 
 #include <avr/io.h>
-#include <util/delay.h> 
+#include <util/delay.h>
 
+static volatile buzzer_state currentBuzzerState = BUZZER_OFF;
 
 void buzzerInit()
 {
@@ -104,7 +106,6 @@ void buzzerPlayNumber(uint16_t number)
 }
 
 
-
 void buzzerOn()
 {
 	PORTB |= (1<<PB4);
@@ -115,8 +116,47 @@ void buzzerOff()
 	PORTB &= ~(1<<PB4);
 }
 
+buzzer_state buzzerGetAlarmState()
+{
+	return currentBuzzerState;	
+}
+
+void buzzerSetAlarmState(buzzer_state state)
+{
+	currentBuzzerState = state;
+}
+
+void buzzerOutputState(buzzer_state state, uint8_t counter)
+{
+	switch (state)
+	{
+		case BUZZER_OFF:
+			buzzerOff();
+			break;
+		case BUZZER_ALARM_SLOW:
+			if((counter >> 1) % 2)
+				buzzerOn();
+			else
+				buzzerOff();
+			break;
+		case BUZZER_ALARM_FAST:
+			if (counter % 2)
+				buzzerOn();
+			else
+				buzzerOff();
+			break;
+		case BUZZER_ALARM_ALWAYS:
+			buzzerOn();
+			break;
+		case BUZZER_NO_CHANGE:
+			break;
+		default:
+			break;
+	}
+}
+
 void buzzerClear()
 {
 	buzzerOff();
-	DDRB &= ~(1<<DDB4);
+	DDRB &= ~(1<<DDB4); // disable output pin
 }

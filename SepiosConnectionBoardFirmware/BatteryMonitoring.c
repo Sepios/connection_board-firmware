@@ -19,6 +19,10 @@
 #define LOWER_LIMIT 92
 #define WARNING_LIMIT 95
 
+
+static volatile uint8_t batteryVoltage = 0;
+
+
 void batteryInit()
 {
 	// Configure ADC
@@ -32,7 +36,7 @@ void batteryClear()
 	ADCSRA &= ~(1<<ADEN); // Disable ADC to save power
 }
 
-uint8_t batteryRead()
+uint8_t batteryMeasureVoltage()
 {
 	ADCSRA |= (1<<ADSC);
 	
@@ -41,29 +45,27 @@ uint8_t batteryRead()
 	{}
 	
 	uint8_t result = ADCH; // Read higher byte (ADCL lower byte)
+	batteryVoltage = result;
 	return result;
 }
 
-/* Does not work concerning floating calculus and ATtiny85
-// Get battery Voltage in 0.01 V steps.
-uint8_t batteryGetVoltage()
+uint8_t batteryGetLastVoltage()
 {
-	return batteryRead() * VOLTAGE_FACTOR;
+	return batteryVoltage;
 }
-*/
 
 uint8_t batteryIsLowVoltage()
 {
-	if (batteryRead() <= LOWER_LIMIT)
+	if (batteryMeasureVoltage() <= LOWER_LIMIT)
 		return 1;
 	else
 		return 0;
 }
 
-uint8_t batteryIsBelowWarningVoltage()
+uint8_t batteryIsBelowWarningVoltage(uint8_t voltage)
 {
-	if (batteryRead() <= WARNING_LIMIT)
-	return 1;
+	if (voltage <= WARNING_LIMIT)
+		return 1;
 	else
-	return 0;
+		return 0;
 }

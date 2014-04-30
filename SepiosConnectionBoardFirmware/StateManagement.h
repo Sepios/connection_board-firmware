@@ -11,14 +11,16 @@
 
 #define SYSTEM_STATE_ADDR 0x00
 
-typedef enum systemState
+typedef enum
 {
-	SYSTEM_ON,
-	SYSTEM_OFF,
-	SYSTEM_FAILURE // low voltage, leakage, high current, collision, etc. may apply to this state.
-} systemState;
+	SYSTEM_ON = 0x00,
+	SYSTEM_OFF = 0x01,
+	SYSTEM_FAILURE = 0x02, // low voltage, leakage, high current, collision, etc. may apply to this state.
+	SYSTEM_UNDEFINED = 0x03
+} system_state;
 
-systemState loadSystemState();
-void saveSystemState(systemState);
+system_state loadSystemState();
+system_state getSystemState();
+void saveSystemState(system_state);
 
 #endif /* STATEMANAGEMENT_H_ */

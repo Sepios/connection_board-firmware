@@ -5,7 +5,9 @@
  *  Author: marwegma
  */
 
-#include "usiTwiSlave.c"
+#include "I2CInterface.h"
+
+#include "usiTwiSlave.h"
 
 #define I2C_SLAVE_ADDR  0x26
 
@@ -14,7 +16,7 @@ void i2cInterfaceInit(){
 	usiTwiSlaveInit(I2C_SLAVE_ADDR); // init I2C slave mode
 }
 
-uint8_t i2cInterfacePoll(){
+i2c_command i2cInterfacePoll(){
 	if (usiTwiDataInReceiveBuffer())
 		return usiTwiReceiveByte();
 	else

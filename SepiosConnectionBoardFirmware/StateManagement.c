@@ -11,12 +11,20 @@
 
 #include <avr/eeprom.h>
 
-enum systemState loadSystemState()
+static volatile currentSystemState = SYSTEM_UNDEFINED;
+
+system_state loadSystemState()
 {
-	return (systemState)eeprom_read_byte((uint8_t*)SYSTEM_STATE_ADDR);
+	return (system_state)eeprom_read_byte((uint8_t*)SYSTEM_STATE_ADDR);
 }
 
-void saveSystemState(systemState state)
+system_state getSystemState()
 {
+	return currentSystemState;
+}
+
+void saveSystemState(system_state state)
+{
+	currentSystemState = state;
 	eeprom_write_byte ((uint8_t*)SYSTEM_STATE_ADDR, state);
 }
