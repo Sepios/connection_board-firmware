@@ -37,13 +37,14 @@ int main(void)
 	else 
 	{
 		// Setup slower non-time-critical section for battery management to check and handle low voltage, running in parallel a time-critical I2C interface in the main loop.
-		TCCR0A = (1<<CS01, 1<<CS00); // Set timer0a to 1/64 of system clock (8Mhz).
-		TIMSK |= (1<<TOIE0); // Enable overflow interrupt.
+		TCCR0A = (1<<CS01 | 1<<CS00); // Set timer0a to 1/64 of system clock (8Mhz).
+		TIMSK |= (1<<TOIE1); // Enable overflow interrupt.
 		sei();
 		
 		
-		// If system was not ON (meaning OFF or FAILURE) last time, switch it ON.
-		if (loadSystemState() != SYSTEM_ON)
+		system_state state = loadSystemState();
+		// If system was not ON and not FAILURE last time, switch it ON. The check on FAILURE prevents switching on after failure and program crash.
+		if (state != SYSTEM_ON && state != SYSTEM_FAILURE)
 		{
 			saveSystemState(SYSTEM_ON);
 			buzzerPlayTriple();
@@ -52,6 +53,8 @@ int main(void)
 			// entering main loop.
 			while(1)
 			{
+				sleep_mode();
+				
 				uint8_t message = i2cInterfacePoll();
 				if (message != 0xff) // if message is not empty
 				{
@@ -91,7 +94,7 @@ int main(void)
 		}
 	}
 
-poweroff:
+//poweroff:
 	buzzerClear();
 	
 	buzzerPlayLong();
@@ -103,12 +106,12 @@ poweroff:
 	
 	while(1)
 	{
+		set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 		sleep_mode(); // go to sleep to save power. gn8. ZZZzzzzzzzz...
 	}
 }
 
 
-#pragma region Interrupts
 
 // Slower non-time-critical interrupt software routine
 ISR (TIMER0_OVF_vect)
@@ -120,6 +123,8 @@ ISR (TIMER0_OVF_vect)
 	// (1/(8Mhz / 64 / 256 / 128) ~) every 0.262144 seconds.
 	if(!(interruptCounter % 128))
 	{
+		batteryADCEnable();
+		
 		// Measure and handle battery
 		if (batteryIsLowVoltage())
 		{
@@ -142,6 +147,8 @@ ISR (TIMER0_OVF_vect)
 			}
 		}
 		
+		batteryClear();
+		
 		
 		// Set buzzer according to the state
 		buzzer_state state = buzzerGetAlarmState();
@@ -159,6 +166,4 @@ ISR (TIMER0_OVF_vect)
 		
 	interruptCounter++;
 }
-
-#pragma endregion Interrupts
 

@@ -11,7 +11,7 @@
 
 #include <avr/eeprom.h>
 
-static volatile currentSystemState = SYSTEM_UNDEFINED;
+static volatile system_state currentSystemState = SYSTEM_UNDEFINED;
 
 system_state loadSystemState()
 {

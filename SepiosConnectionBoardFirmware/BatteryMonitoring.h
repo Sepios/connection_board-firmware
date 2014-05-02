@@ -12,10 +12,10 @@
 #define LOWVOLTAGECOUNTERLIMIT 24
 
 void batteryInit();
+void batteryADCEnable();
 uint8_t batteryMeasureVoltage();
 uint8_t batteryGetLastVoltage();
 uint8_t batteryIsLowVoltage();
 void batteryClear();
 uint8_t batteryIsBelowWarningVoltage(uint8_t voltage);
-
 #endif /* BATTERYMONITORING_H_ */

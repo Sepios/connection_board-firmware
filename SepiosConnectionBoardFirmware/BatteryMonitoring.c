@@ -17,7 +17,7 @@
 
 // Calculation of lower voltage limit of LiPo battery (2 x 3.2 V = 7.4 V): 2 x 3.3 V (3.1 V min.) lower limit cell = 6.6 V. In Bits: 6.6 / 0.07176470588 = 91.9672131178 ~ 92
 #define LOWER_LIMIT 92
-#define WARNING_LIMIT 95
+#define WARNING_LIMIT 95 // ~ 6.82 V
 
 
 static volatile uint8_t batteryVoltage = 0;
@@ -25,9 +25,16 @@ static volatile uint8_t batteryVoltage = 0;
 
 void batteryInit()
 {
+	ACSR = 0x80; // disable analog comparator since it is not needed
+	
 	// Configure ADC
 	ADCSRA |= (1<<ADPS2) | (1<<ADPS1); // Set ADC prescaler to 64 --> 125 kHz ADC clock
 	ADMUX |= (1 << ADLAR) | (1<<MUX1) | (1<<MUX0); // Left align ADC register, making ADCH the higher 8 bits, and ADCL the lower 2 bits. Select ADC channel 3.
+	ADCSRA |= (1<<ADEN); // Enable ADC
+}
+
+void batteryADCEnable()
+{
 	ADCSRA |= (1<<ADEN); // Enable ADC
 }
 
