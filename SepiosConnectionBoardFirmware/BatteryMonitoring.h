@@ -9,7 +9,7 @@
 #ifndef BATTERYMONITORING_H_
 #define BATTERYMONITORING_H_
 
-#define LOWVOLTAGECOUNTERLIMIT 24
+#define LOWVOLTAGECOUNTERLIMIT 100
 
 void batteryInit();
 void batteryADCEnable();
